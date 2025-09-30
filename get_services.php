@@ -9,8 +9,8 @@ try {
         echo "<li class='list-group-item service-item d-flex justify-content-between align-items-center' data-id='{$service['id']}'>
                 <span>{$service['name']}</span>
                 <div>
-                    <button class='btn btn-sm btn-outline-secondary edit-service' data-id='{$service['id']}'><i class='bi bi-pencil'></i></button>
-                    <button class='btn btn-sm btn-outline-danger delete-service' data-id='{$service['id']}'><i class='bi bi-trash'></i></button>
+                    <button class='btn btn-xs btn-outline-secondary edit-service' data-id='{$service['id']}'><i class='bi bi-pencil'></i></button>
+                    <button class='btn btn-xs btn-outline-danger delete-service' data-id='{$service['id']}'><i class='bi bi-trash'></i></button>
                 </div>
               </li>";
     }

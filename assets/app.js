@@ -60,6 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (files.length > 0) {
             uploadFiles(files, testId);
             bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+            // Clear input
+            fileInput.value = null;
         } else {
             alert('Please select a file or paste an image.');
         }
@@ -165,6 +167,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then(() => {
             loadServices();
             bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
+            // Clear form
+            document.getElementById('serviceId').value = '';
+            document.getElementById('serviceName').value = '';
+            document.getElementById('serviceDescription').value = '';
         });
     });
 
@@ -225,6 +231,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 loadTests(activeService.dataset.id);
             }
             bootstrap.Modal.getInstance(document.getElementById('testModal')).hide();
+            // Clear form
+            document.getElementById('testId').value = '';
+            document.getElementById('testServiceId').value = '';
+            document.getElementById('testName').value = '';
+            document.getElementById('testDescription').value = '';
         });
     });
 
@@ -252,6 +263,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     loadTests(activeService.dataset.id);
                 }
                 bootstrap.Modal.getInstance(document.getElementById('csvModal')).hide();
+                // Clear form
+                document.getElementById('csvFile').value = null;
+                document.getElementById('csvType').value = 'services';
             } else {
                 alert('Import failed: ' + data.error);
             }
@@ -261,6 +275,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Comment form
     document.getElementById('commentForm').addEventListener('submit', function (e) {
         e.preventDefault();
+        const button = this.querySelector('button[type="submit"]');
+        const originalText = button.textContent;
+        button.textContent = 'Uploading...';
+        button.disabled = true;
+
         const formData = new FormData();
         formData.append('image_id', document.getElementById('commentImageId').value);
         formData.append('comment_text', document.getElementById('commentText').value);
@@ -272,13 +291,19 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'POST',
             body: formData
         }).then(response => response.json()).then(data => {
+            button.textContent = originalText;
+            button.disabled = false;
             if (data.success) {
                 document.getElementById('commentText').value = '';
-                document.getElementById('commentImage').value = '';
+                document.getElementById('commentImage').value = null;
                 loadComments(document.getElementById('commentImageId').value);
             } else {
                 alert('Error: ' + (data.error || 'Failed to add comment'));
             }
+        }).catch(error => {
+            button.textContent = originalText;
+            button.disabled = false;
+            alert('Upload failed: ' + error.message);
         });
     });
 });

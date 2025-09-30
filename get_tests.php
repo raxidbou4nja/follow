@@ -34,8 +34,8 @@ if ($service_id) {
             echo "<td style='width:100px'>$image_links</td>";
             echo "<td><button class='btn btn-sm btn-primary upload-btn' data-test-id='{$test['id']}'><i class='bi bi-upload'></i> Upload</button></td>";
             echo "<td>
-                    <button class='btn btn-sm btn-outline-secondary edit-test' data-id='{$test['id']}'><i class='bi bi-pencil'></i></button>
-                    <button class='btn btn-sm btn-outline-danger delete-test' data-id='{$test['id']}'><i class='bi bi-trash'></i></button>
+                    <button class='btn btn-xs btn-outline-secondary edit-test' data-id='{$test['id']}'><i class='bi bi-pencil'></i></button>
+                    <button class='btn btn-xs btn-outline-danger delete-test' data-id='{$test['id']}'><i class='bi bi-trash'></i></button>
                   </td>";
             echo "</tr>";
         }

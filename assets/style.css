@@ -309,6 +309,13 @@ body {
 .sidebar::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 123, 255, 0.7);
 }
+
+.btn-xs {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.75rem;
+  border-radius: 0.2rem;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     margin: 10px;

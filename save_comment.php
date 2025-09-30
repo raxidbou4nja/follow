@@ -19,7 +19,7 @@ if (!empty($image_id) && !empty($comment_text)) {
     try {
         $stmt = $pdo->prepare("INSERT INTO comments (image_id, comment_text, image_url) VALUES (?, ?, ?)");
         $stmt->execute([$image_id, $comment_text, $image_url]);
-        echo json_encode(['success' => true]);
+        echo json_encode(['success' => true, 'image_url' => $image_url ?: null]);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
     }

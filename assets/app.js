@@ -357,6 +357,96 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
+
+    // Edit comment - click on text or edit button
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('editable-comment') || e.target.classList.contains('edit-comment') || e.target.closest('.edit-comment')) {
+            const commentId = e.target.dataset.commentId || e.target.closest('.edit-comment').dataset.commentId;
+            const commentSpan = document.querySelector(`.editable-comment[data-comment-id="${commentId}"]`);
+            if (commentSpan) {
+                startEditingComment(commentSpan, commentId);
+            }
+        }
+    });
+
+    // Handle comment editing
+    function startEditingComment(commentSpan, commentId) {
+        const originalText = commentSpan.textContent;
+        const textarea = document.createElement('textarea');
+        textarea.className = 'form-control form-control-sm';
+        textarea.value = originalText;
+        textarea.style.resize = 'none';
+        textarea.style.minHeight = '60px';
+        textarea.style.whiteSpace = 'pre-wrap';
+
+        // Replace span with textarea
+        commentSpan.parentNode.replaceChild(textarea, commentSpan);
+        textarea.focus();
+        textarea.select();
+
+        // Handle save on Enter (without Shift) or blur
+        textarea.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                saveCommentEdit(textarea, commentId, originalText);
+            } else if (e.key === 'Escape') {
+                cancelCommentEdit(textarea, commentId, originalText);
+            }
+        });
+
+        textarea.addEventListener('blur', function () {
+            saveCommentEdit(textarea, commentId, originalText);
+        });
+    }
+
+    function saveCommentEdit(textarea, commentId, originalText) {
+        const newText = textarea.value.trim();
+        if (newText === originalText) {
+            // No changes, just cancel
+            cancelCommentEdit(textarea, commentId, originalText);
+            return;
+        }
+
+        if (newText === '') {
+            alert('Comment cannot be empty');
+            textarea.focus();
+            return;
+        }
+
+        // Save to server
+        fetch('update_comment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `comment_id=${commentId}&comment_text=${encodeURIComponent(newText)}`
+        }).then(response => response.json()).then(data => {
+            if (data.success) {
+                // Replace textarea with updated span
+                const span = document.createElement('span');
+                span.className = 'comment-text text-dark editable-comment';
+                span.dataset.commentId = commentId;
+                span.style.cursor = 'pointer';
+                span.style.whiteSpace = 'pre-line';
+                span.textContent = newText;
+                textarea.parentNode.replaceChild(span, textarea);
+            } else {
+                alert('Error: ' + (data.error || 'Failed to update comment'));
+                cancelCommentEdit(textarea, commentId, originalText);
+            }
+        }).catch(error => {
+            alert('Update failed: ' + error.message);
+            cancelCommentEdit(textarea, commentId, originalText);
+        });
+    }
+
+    function cancelCommentEdit(textarea, commentId, originalText) {
+        const span = document.createElement('span');
+        span.className = 'comment-text text-dark editable-comment';
+        span.dataset.commentId = commentId;
+        span.style.cursor = 'pointer';
+        span.style.whiteSpace = 'pre-line';
+        span.textContent = originalText;
+        textarea.parentNode.replaceChild(span, textarea);
+    }
 });
 
 // Comment functions
@@ -371,14 +461,19 @@ function loadComments(imageId) {
                 div.className = 'comment mb-2 p-2 border rounded bg-light d-flex justify-content-between align-items-start';
                 let html = `<div class="flex-grow-1">
                     <small class="text-muted fw-bold">${new Date(comment.created_at).toLocaleString()}</small><br>
-                    <span class="text-dark">${comment.comment_text}</span>`;
+                    <span class="comment-text text-dark editable-comment" data-comment-id="${comment.id}" style="cursor: pointer; white-space: pre-line;">${comment.comment_text}</span>`;
                 if (comment.image_url) {
                     html += `<br><img src="${comment.image_url}" class="img-fluid mt-2 rounded" style="max-width: 100%;">`;
                 }
                 html += `</div>
-                    <button class="btn btn-sm btn-outline-danger delete-comment ms-2" data-comment-id="${comment.id}" title="Delete comment">
-                        <i class="bi bi-trash"></i>
-                    </button>`;
+                    <div class="btn-group btn-group-sm ms-2" role="group">
+                        <button class="btn btn-outline-secondary edit-comment" data-comment-id="${comment.id}" title="Edit comment" style="padding: 0.1rem 0.3rem; font-size: 0.75rem;">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-outline-danger delete-comment" data-comment-id="${comment.id}" title="Delete comment" style="padding: 0.1rem 0.3rem; font-size: 0.75rem;">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>`;
                 div.innerHTML = html;
                 list.appendChild(div);
             });

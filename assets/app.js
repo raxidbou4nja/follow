@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('edit-service')) {
-            const id = e.target.dataset.id;
+        if (e.target.classList.contains('edit-service') || e.target.closest('.edit-service')) {
+            const id = e.target.dataset.id || e.target.closest('.edit-service').dataset.id;
             fetch(`get_service.php?id=${id}`)
                 .then(response => response.json())
                 .then(data => {
@@ -137,9 +137,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('serviceModalLabel').textContent = 'Edit Service';
                     new bootstrap.Modal(document.getElementById('serviceModal')).show();
                 });
-        } else if (e.target.classList.contains('delete-service')) {
+        } else if (e.target.classList.contains('delete-service') || e.target.closest('.delete-service')) {
             if (confirm('Delete this service?')) {
-                const id = e.target.dataset.id;
+                const id = e.target.dataset.id || e.target.closest('.delete-service').dataset.id;
                 fetch('delete_service.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -184,8 +184,8 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('testDescription').value = '';
             document.getElementById('testModalLabel').textContent = 'Add Test';
             new bootstrap.Modal(document.getElementById('testModal')).show();
-        } else if (e.target.classList.contains('edit-test')) {
-            const id = e.target.dataset.id;
+        } else if (e.target.classList.contains('edit-test') || e.target.closest('.edit-test')) {
+            const id = e.target.dataset.id || e.target.closest('.edit-test').dataset.id;
             fetch(`get_test.php?id=${id}`)
                 .then(response => response.json())
                 .then(data => {
@@ -200,9 +200,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('testModalLabel').textContent = 'Edit Test';
                     new bootstrap.Modal(document.getElementById('testModal')).show();
                 });
-        } else if (e.target.classList.contains('delete-test')) {
+        } else if (e.target.classList.contains('delete-test') || e.target.closest('.delete-test')) {
             if (confirm('Delete this test?')) {
-                const id = e.target.dataset.id;
+                const id = e.target.dataset.id || e.target.closest('.delete-test').dataset.id;
                 fetch('delete_test.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

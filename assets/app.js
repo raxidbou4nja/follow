@@ -335,6 +335,28 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Upload failed: ' + error.message);
         });
     });
+
+    // Delete comment
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('delete-comment') || e.target.closest('.delete-comment')) {
+            if (confirm('Delete this comment?')) {
+                const commentId = e.target.dataset.commentId || e.target.closest('.delete-comment').dataset.commentId;
+                fetch('delete_comment.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `comment_id=${commentId}`
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        loadComments(document.getElementById('commentImageId').value);
+                    } else {
+                        alert('Error: ' + (data.error || 'Failed to delete comment'));
+                    }
+                }).catch(error => {
+                    alert('Delete failed: ' + error.message);
+                });
+            }
+        }
+    });
 });
 
 // Comment functions
@@ -346,11 +368,17 @@ function loadComments(imageId) {
             list.innerHTML = '';
             comments.forEach(comment => {
                 const div = document.createElement('div');
-                div.className = 'comment mb-2 p-2 border rounded bg-light';
-                let html = `<small class="text-muted fw-bold">${new Date(comment.created_at).toLocaleString()}</small><br><span class="text-dark">${comment.comment_text}</span>`;
+                div.className = 'comment mb-2 p-2 border rounded bg-light d-flex justify-content-between align-items-start';
+                let html = `<div class="flex-grow-1">
+                    <small class="text-muted fw-bold">${new Date(comment.created_at).toLocaleString()}</small><br>
+                    <span class="text-dark">${comment.comment_text}</span>`;
                 if (comment.image_url) {
                     html += `<br><img src="${comment.image_url}" class="img-fluid mt-2 rounded" style="max-width: 100%;">`;
                 }
+                html += `</div>
+                    <button class="btn btn-sm btn-outline-danger delete-comment ms-2" data-comment-id="${comment.id}" title="Delete comment">
+                        <i class="bi bi-trash"></i>
+                    </button>`;
                 div.innerHTML = html;
                 list.appendChild(div);
             });

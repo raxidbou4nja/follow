@@ -235,6 +235,10 @@ body {
   background-color: #007bff;
 }
 
+.checkbox-container input.has-error:checked + .checkmark {
+  background-color: #dc3545;
+}
+
 .checkbox-container input:checked + .checkmark:before {
   transform: translateX(26px);
 }

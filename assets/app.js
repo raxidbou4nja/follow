@@ -58,10 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const fileInput = document.getElementById('fileInput');
         const files = fileInput.files;
         if (files.length > 0) {
-            uploadFiles(files, testId);
-            bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
-            // Clear input
-            fileInput.value = null;
+            uploadFiles(files, testId, this);
         } else {
             alert('Please select a file or paste an image.');
         }
@@ -75,41 +72,73 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('pasteArea').addEventListener('paste', function (e) {
         const testId = document.getElementById('uploadTestId').value;
         const items = e.clipboardData.items;
+        const uploadBtn = document.getElementById('uploadImageBtn');
         for (let i = 0; i < items.length; i++) {
             if (items[i].type.indexOf('image') !== -1) {
                 const file = items[i].getAsFile();
-                uploadFiles([file], testId);
-                bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+                uploadFiles([file], testId, uploadBtn);
                 break;
             }
         }
     });
 
-    function uploadFiles(files, testId) {
+    function uploadFiles(files, testId, button) {
+        // Disable button and show loading state
+        const originalText = button.textContent;
+        button.textContent = 'Uploading...';
+        button.disabled = true;
+
+        let uploadPromises = [];
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const formData = new FormData();
             formData.append('image', file);
             formData.append('test_id', testId);
-            fetch('upload_image.php', {
+
+            const promise = fetch('upload_image.php', {
                 method: 'POST',
                 body: formData
             }).then(response => response.json()).then(data => {
                 if (data.error) {
                     alert('Error: ' + data.error);
-                    return;
+                    return false;
                 }
                 if (data.success) {
-                    // Reload tests to show new images
-                    const activeService = document.querySelector('.service-item.active');
-                    if (activeService) {
-                        loadTests(activeService.dataset.id);
-                    }
+                    return true;
                 } else {
                     alert('Upload failed: ' + data.error);
+                    return false;
                 }
+            }).catch(error => {
+                alert('Upload failed: ' + error.message);
+                return false;
             });
+
+            uploadPromises.push(promise);
         }
+
+        // Wait for all uploads to complete
+        Promise.all(uploadPromises).then(results => {
+            // Restore button state
+            button.textContent = originalText;
+            button.disabled = false;
+
+            // Check if at least one upload was successful
+            if (results.some(result => result === true)) {
+                // Reload tests to show new images
+                const activeService = document.querySelector('.service-item.active');
+                if (activeService) {
+                    loadTests(activeService.dataset.id);
+                }
+
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('uploadModal')).hide();
+
+                // Clear file input
+                const fileInput = document.getElementById('fileInput');
+                fileInput.value = null;
+            }
+        });
     }
 
     // Service CRUD

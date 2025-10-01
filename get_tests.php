@@ -14,7 +14,7 @@ if ($service_id) {
 
         echo '<div class="table-responsive">';
         echo '<table class="table table-striped">';
-        echo '<thead><tr><th>Name</th><th>Description</th><th>Passed</th><th>Error</th><th>Images</th><th>Upload</th><th>Actions</th></tr></thead>';
+        echo '<thead><tr><th>Name</th><th style="width: 30%;">Description</th><th>Passed</th><th>Error</th><th>Images</th><th>Upload</th><th>Actions</th></tr></thead>';
         echo '<tbody>';
 
         foreach ($tests as $test) {

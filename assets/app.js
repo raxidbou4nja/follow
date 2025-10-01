@@ -20,15 +20,63 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.target.classList.contains('image-link')) {
             e.preventDefault();
             const url = e.target.dataset.url;
-            const imageId = e.target.dataset.imageId; // Need to add this
+            const imageId = e.target.dataset.imageId;
+            const isSolved = e.target.dataset.isSolved == '1';
+
+            console.log('Image clicked:', { url, imageId, isSolved, element: e.target });
+            console.log('All dataset:', e.target.dataset);
+
             document.getElementById('modal-image').src = url;
             document.getElementById('commentImageId').value = imageId;
+            updateSolvedButton(isSolved);
             loadComments(imageId);
             new bootstrap.Modal(document.getElementById('imageModal')).show();
         }
     });
 
-    // Checkbox updates (placeholder for now)
+    // Toggle solved status
+    document.getElementById('toggleSolvedBtn').addEventListener('click', function () {
+        const imageId = document.getElementById('commentImageId').value;
+        const button = this;
+
+        // Get current solved state from the button's appearance
+        // If button is green (btn-success), it means "Mark as Solved" -> current state is unsolved
+        // If button is yellow (btn-warning), it means "Mark as Unsolved" -> current state is solved
+        const currentState = button.classList.contains('btn-warning'); // true if already solved
+        const newState = !currentState;
+
+        console.log('Toggling solved status:', { imageId, currentState, newState });
+
+        // Validate imageId
+        if (!imageId || imageId === '' || imageId === 'undefined') {
+            alert('Error: No image ID found. Please close the modal and click on an image link again.');
+            return;
+        }
+
+        fetch('update_image_solved.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image_id: parseInt(imageId), is_solved: newState })
+        }).then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        }).then(data => {
+            console.log('Response data:', data);
+            if (data.success) {
+                updateSolvedButton(newState);
+                // Reload tests to update the View link color
+                const activeService = document.querySelector('.service-item.active');
+                if (activeService) {
+                    loadTests(activeService.dataset.id);
+                }
+            } else {
+                alert('Error updating status: ' + (data.error || 'Unknown error'));
+            }
+        }).catch(error => {
+            console.error('Fetch error:', error);
+            alert('Network error: ' + error.message);
+        });
+    });    // Checkbox updates (placeholder for now)
     document.addEventListener('change', function (e) {
         if (e.target.classList.contains('is-passed') || e.target.classList.contains('has-error')) {
             const testId = e.target.closest('tr').dataset.testId;
@@ -495,4 +543,17 @@ function loadTests(serviceId) {
         .then(html => {
             document.getElementById('tests-container').innerHTML = html;
         });
+}
+
+function updateSolvedButton(isSolved) {
+    const button = document.getElementById('toggleSolvedBtn');
+    if (isSolved) {
+        button.classList.remove('btn-success');
+        button.classList.add('btn-warning');
+        button.innerHTML = '<i class="bi bi-x-circle"></i> Mark as Unsolved';
+    } else {
+        button.classList.remove('btn-warning');
+        button.classList.add('btn-success');
+        button.innerHTML = '<i class="bi bi-check-circle"></i> Mark as Solved';
+    }
 }

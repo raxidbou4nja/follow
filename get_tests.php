@@ -18,13 +18,14 @@ if ($service_id) {
         echo '<tbody>';
 
         foreach ($tests as $test) {
-            $images = $pdo->prepare("SELECT id, image_url FROM test_images WHERE test_id = ?");
+            $images = $pdo->prepare("SELECT id, image_url, is_solved FROM test_images WHERE test_id = ?");
             $images->execute([$test['id']]);
             $image_data = $images->fetchAll(PDO::FETCH_ASSOC);
 
             $image_links = '';
             foreach ($image_data as $img) {
-                $image_links .= "<a href='#' class='image-link' data-url='{$img['image_url']}' data-image-id='{$img['id']}'>View</a> ";
+                $solved_class = $img['is_solved'] ? 'solved-image' : '';
+                $image_links .= "<a href='#' class='image-link {$solved_class}' data-url='{$img['image_url']}' data-image-id='{$img['id']}' data-is-solved='{$img['is_solved']}'>View</a> ";
             }
             echo "<tr data-test-id='{$test['id']}'>";
             echo "<td>{$test['name']}</td>";

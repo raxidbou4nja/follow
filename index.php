@@ -47,7 +47,12 @@ if (!isset($_COOKIE['user_id'])) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Image</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <div>
+                        <button type="button" class="btn btn-success btn-sm me-2" id="toggleSolvedBtn">
+                            <i class="bi bi-check-circle"></i> Mark as Solved
+                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
                 </div>
                 <div class="modal-body">
                     <div class="row">

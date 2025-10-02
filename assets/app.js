@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+    let currentFilter = 'all';
     // Load initial services
     loadServices();
 
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Add to clicked
             item.classList.add('active');
             const serviceId = item.dataset.id;
+            currentFilter = 'all';
             loadTests(serviceId);
         }
     });
@@ -562,11 +564,23 @@ function loadServices() {
         });
 }
 
-function loadTests(serviceId) {
-    fetch(`get_tests.php?service_id=${serviceId}`)
+function loadTests(serviceId, newFilter = null) {
+    if (newFilter !== null) {
+        currentFilter = newFilter;
+    }
+    fetch(`get_tests.php?service_id=${serviceId}&filter=${currentFilter}`)
         .then(response => response.text())
         .then(html => {
             document.getElementById('tests-container').innerHTML = html;
+            // Add event listeners for filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const activeService = document.querySelector('.service-item.active');
+                    if (activeService) {
+                        loadTests(activeService.dataset.id, this.dataset.filter);
+                    }
+                });
+            });
         });
 }
 

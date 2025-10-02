@@ -4,11 +4,26 @@ ini_set('display_errors', 0);
 require_once 'includes/connection.php';
 
 $service_id = $_GET['service_id'] ?? 0;
+$filter = $_GET['filter'] ?? 'all';
 
 if ($service_id) {
     try {
         echo '<button class="btn btn-primary btn-sm mb-2" id="add-test-btn" data-service-id="' . $service_id . '">Add Test</button>';
-        $stmt = $pdo->prepare("SELECT * FROM tests WHERE service_id = ? ORDER BY name");
+
+        $all_active = $filter == 'all' ? ' active' : '';
+        $passed_active = $filter == 'passed' ? ' active' : '';
+        $error_active = $filter == 'error' ? ' active' : '';
+        echo '<div class="mb-2">';
+        echo '<button class="btn btn-secondary btn-sm me-2 filter-btn' . $all_active . '" data-filter="all">All</button>';
+        echo '<button class="btn btn-success btn-sm me-2 filter-btn' . $passed_active . '" data-filter="passed">Passed</button>';
+        echo '<button class="btn btn-danger btn-sm me-2 filter-btn' . $error_active . '" data-filter="error">With Errors</button>';
+        echo '</div>';
+
+        $where = "WHERE service_id = ?";
+        if ($filter == 'passed') $where .= " AND is_passed = 1";
+        elseif ($filter == 'error') $where .= " AND has_error = 1";
+
+        $stmt = $pdo->prepare("SELECT * FROM tests $where ORDER BY name");
         $stmt->execute([$service_id]);
         $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

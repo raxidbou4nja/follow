@@ -1,5 +1,6 @@
+let currentFilter = 'all';
+
 document.addEventListener('DOMContentLoaded', function () {
-    let currentFilter = 'all';
     // Load initial services
     loadServices();
 

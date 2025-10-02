@@ -423,3 +423,65 @@ body {
     font-size: 14px;
   }
 }
+
+/* Comments Section Styling */
+#comments-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 123, 255, 0.5) rgba(255, 255, 255, 0.1);
+}
+
+#comments-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+#comments-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+#comments-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 123, 255, 0.5);
+  border-radius: 10px;
+}
+
+#comments-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 123, 255, 0.7);
+}
+
+.comment {
+  transition: all 0.2s ease;
+  animation: fadeInComment 0.3s ease-in-out;
+}
+
+.comment:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+@keyframes fadeInComment {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+  border-width: 0.25em;
+}
+
+.delete-comment:hover,
+.edit-comment:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+}
+
+.comment-text {
+  word-wrap: break-word;
+  word-break: break-word;
+}

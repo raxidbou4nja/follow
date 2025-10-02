@@ -499,11 +499,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Comment functions
 function loadComments(imageId) {
+    const list = document.getElementById('comments-list');
+
+    // Show loading spinner
+    list.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading comments...</p>
+        </div>
+    `;
+
     fetch(`get_comments.php?image_id=${imageId}`)
         .then(response => response.json())
         .then(comments => {
-            const list = document.getElementById('comments-list');
             list.innerHTML = '';
+
+            if (comments.length === 0) {
+                list.innerHTML = '<p class="text-muted text-center py-3">No comments yet. Be the first to comment!</p>';
+                return;
+            }
+
             comments.forEach(comment => {
                 const div = document.createElement('div');
                 div.className = 'comment mb-2 p-2 border rounded bg-light d-flex justify-content-between align-items-start';
@@ -525,6 +542,14 @@ function loadComments(imageId) {
                 div.innerHTML = html;
                 list.appendChild(div);
             });
+        })
+        .catch(error => {
+            list.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> Failed to load comments. Please try again.
+                </div>
+            `;
+            console.error('Error loading comments:', error);
         });
 }
 

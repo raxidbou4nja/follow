@@ -569,10 +569,22 @@ function loadTests(serviceId, newFilter = null) {
     if (newFilter !== null) {
         currentFilter = newFilter;
     }
+
+    // Show loading status
+    const testsContainer = document.getElementById('tests-container');
+    testsContainer.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading tests...</p>
+        </div>
+    `;
+
     fetch(`get_tests.php?service_id=${serviceId}&filter=${currentFilter}`)
         .then(response => response.text())
         .then(html => {
-            document.getElementById('tests-container').innerHTML = html;
+            testsContainer.innerHTML = html;
             // Add event listeners for filter buttons
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', function () {
@@ -582,6 +594,14 @@ function loadTests(serviceId, newFilter = null) {
                     }
                 });
             });
+        })
+        .catch(error => {
+            testsContainer.innerHTML = `
+                <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i> Failed to load tests. Please try again.
+                </div>
+            `;
+            console.error('Error loading tests:', error);
         });
 }
 

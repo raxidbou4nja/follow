@@ -79,7 +79,34 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Fetch error:', error);
             alert('Network error: ' + error.message);
         });
-    });    // Checkbox updates (placeholder for now)
+    });
+
+    // Delete image button
+    document.getElementById('deleteImageBtn').addEventListener('click', function () {
+        if (confirm('Delete this image?')) {
+            const imageId = document.getElementById('commentImageId').value;
+
+            fetch('delete_image.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: imageId })
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    // Close modal
+                    bootstrap.Modal.getInstance(document.getElementById('imageModal')).hide();
+                    // Reload tests
+                    const activeService = document.querySelector('.service-item.active');
+                    if (activeService) {
+                        loadTests(activeService.dataset.id);
+                    }
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to delete image'));
+                }
+            }).catch(error => {
+                alert('Delete failed: ' + error.message);
+            });
+        }
+    });
     document.addEventListener('change', function (e) {
         if (e.target.classList.contains('is-passed') || e.target.classList.contains('has-error')) {
             const testId = e.target.closest('tr').dataset.testId;

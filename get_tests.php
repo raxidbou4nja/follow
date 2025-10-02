@@ -14,17 +14,31 @@ if ($service_id) {
         $passed_active = $filter == 'passed' ? ' active' : '';
         $error_active = $filter == 'error' ? ' active' : '';
         $undone_active = $filter == 'undone' ? ' active' : '';
-        echo '<div class="mb-2">';
+        echo '<div class="d-flex justify-content-between align-items-center mb-2">';
+        echo '<div>';
         echo '<button class="btn btn-secondary btn-sm me-2 filter-btn' . $all_active . '" data-filter="all">All</button>';
         echo '<button class="btn btn-success btn-sm me-2 filter-btn' . $passed_active . '" data-filter="passed">Passed</button>';
         echo '<button class="btn btn-danger btn-sm me-2 filter-btn' . $error_active . '" data-filter="error">With Errors</button>';
         echo '<button class="btn btn-warning btn-sm me-2 filter-btn' . $undone_active . '" data-filter="undone">Undone</button>';
+        echo '</div>';
+        echo '<div class="text-muted">';
+        echo '<small>Solved: ' . $solved . '/' . $total . '</small>';
+        echo '</div>';
         echo '</div>';
 
         $where = "WHERE service_id = ?";
         if ($filter == 'passed') $where .= " AND is_passed = 1";
         elseif ($filter == 'error') $where .= " AND has_error = 1";
         elseif ($filter == 'undone') $where .= " AND is_passed = 0 AND has_error = 0";
+
+        // Get statistics
+        $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ?");
+        $totalStmt->execute([$service_id]);
+        $total = $totalStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        $solvedStmt = $pdo->prepare("SELECT COUNT(*) as solved FROM tests WHERE service_id = ? AND is_passed = 1");
+        $solvedStmt->execute([$service_id]);
+        $solved = $solvedStmt->fetch(PDO::FETCH_ASSOC)['solved'];
 
         $stmt = $pdo->prepare("SELECT * FROM tests $where ORDER BY name");
         $stmt->execute([$service_id]);

@@ -10,6 +10,15 @@ if ($service_id) {
     try {
         echo '<button class="btn btn-primary btn-sm mb-2" id="add-test-btn" data-service-id="' . $service_id . '">Add Test</button>';
 
+        // Get statistics first
+        $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ?");
+        $totalStmt->execute([$service_id]);
+        $total = $totalStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        $solvedStmt = $pdo->prepare("SELECT COUNT(*) as solved FROM tests WHERE service_id = ? AND is_passed = 1");
+        $solvedStmt->execute([$service_id]);
+        $solved = $solvedStmt->fetch(PDO::FETCH_ASSOC)['solved'];
+
         $all_active = $filter == 'all' ? ' active' : '';
         $passed_active = $filter == 'passed' ? ' active' : '';
         $error_active = $filter == 'error' ? ' active' : '';
@@ -21,8 +30,20 @@ if ($service_id) {
         echo '<button class="btn btn-danger btn-sm me-2 filter-btn' . $error_active . '" data-filter="error">With Errors</button>';
         echo '<button class="btn btn-warning btn-sm me-2 filter-btn' . $undone_active . '" data-filter="undone">Undone</button>';
         echo '</div>';
-        echo '<div class="text-muted">';
-        echo '<small>Solved: ' . $solved . '/' . $total . '</small>';
+        echo '<div class="d-flex align-items-center">';
+        $percentage = $total > 0 ? round(($solved / $total) * 100) : 0;
+        $progressClass = $percentage >= 80 ? 'bg-success' : ($percentage >= 50 ? 'bg-warning' : 'bg-danger');
+        echo '<div class="me-3">';
+        echo '<small class="text-muted me-2">Progress:</small>';
+        echo '<div class="progress" style="width: 120px; height: 20px;">';
+        echo '<div class="progress-bar ' . $progressClass . '" role="progressbar" style="width: ' . $percentage . '%">';
+        echo '<small class="text-white fw-bold">' . $percentage . '%</small>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        echo '<div class="badge bg-secondary">';
+        echo $solved . '/' . $total . ' solved';
+        echo '</div>';
         echo '</div>';
         echo '</div>';
 
@@ -30,15 +51,6 @@ if ($service_id) {
         if ($filter == 'passed') $where .= " AND is_passed = 1";
         elseif ($filter == 'error') $where .= " AND has_error = 1";
         elseif ($filter == 'undone') $where .= " AND is_passed = 0 AND has_error = 0";
-
-        // Get statistics
-        $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ?");
-        $totalStmt->execute([$service_id]);
-        $total = $totalStmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-        $solvedStmt = $pdo->prepare("SELECT COUNT(*) as solved FROM tests WHERE service_id = ? AND is_passed = 1");
-        $solvedStmt->execute([$service_id]);
-        $solved = $solvedStmt->fetch(PDO::FETCH_ASSOC)['solved'];
 
         $stmt = $pdo->prepare("SELECT * FROM tests $where ORDER BY name");
         $stmt->execute([$service_id]);

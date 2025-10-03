@@ -117,6 +117,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ test_id: testId, field: field, value: value })
+            }).then(() => {
+                // Update progress bar dynamically
+                updateProgressBar();
             });
         }
     });
@@ -642,5 +645,38 @@ function updateSolvedButton(isSolved) {
         button.classList.remove('btn-warning');
         button.classList.add('btn-success');
         button.innerHTML = '<i class="bi bi-check-circle"></i> Mark as Solved';
+    }
+}
+
+function updateProgressBar() {
+    // Count checked passed checkboxes
+    const totalTests = document.querySelectorAll('.is-passed').length;
+    const solvedTests = document.querySelectorAll('.is-passed:checked').length;
+
+    const progressBar = document.querySelector('.progress-bar');
+    const badge = document.querySelector('.badge');
+
+    if (progressBar && badge) {
+        const percentage = totalTests > 0 ? Math.round((solvedTests / totalTests) * 100) : 0;
+
+        // Update progress bar with animation
+        progressBar.style.width = percentage + '%';
+        progressBar.innerHTML = '<small class="text-white fw-bold">' + percentage + '%</small>';
+
+        // Update progress bar color based on percentage
+        progressBar.className = 'progress-bar';
+        if (percentage >= 80) {
+            progressBar.classList.add('bg-success');
+        } else if (percentage >= 50) {
+            progressBar.classList.add('bg-warning');
+        } else {
+            progressBar.classList.add('bg-danger');
+        }
+
+        // Update badge
+        badge.textContent = solvedTests + '/' + totalTests + ' solved';
+
+        // Add a subtle animation effect
+        progressBar.style.transition = 'width 0.3s ease-in-out';
     }
 }

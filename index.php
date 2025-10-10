@@ -41,6 +41,26 @@ $is_admin = isAdmin();
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="mb-0">Tests</h2>
                     <div>
+                        <div class="btn me-2">
+                            <button class="btn btn-outline-secondary btn-custom position-relative" id="notification-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none;">
+                                    0
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notification-dropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                                <li class="dropdown-header d-flex justify-content-between align-items-center">
+                                    <span>Notifications</span>
+                                    <button class="btn btn-sm btn-link text-decoration-none" id="mark-all-read">Mark all read</button>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li id="notification-list">
+                                    <div class="text-center text-muted p-3">Loading...</div>
+                                </li>
+                            </ul>
+                        </div>
                         <?php if ($is_admin): ?>
                             <a href="users.php" class="btn btn-success btn-custom me-2"><i class="bi bi-people"></i> Users</a>
                             <a href="roles.php" class="btn btn-info btn-custom me-2"><i class="bi bi-person-badge"></i> Roles</a>

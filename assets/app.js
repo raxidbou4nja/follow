@@ -4,7 +4,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load initial services
     loadServices();
 
+    // Load notifications
+    loadNotifications();
+
+    // Refresh notifications every 30 seconds
+    setInterval(loadNotifications, 30000);
+
     // Service selection
+    // Notification handlers
+    document.getElementById('mark-all-read').addEventListener('click', function () {
+        fetch('mark_notification_read.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mark_all: true })
+        }).then(() => {
+            loadNotifications();
+        });
+    });
+
     document.addEventListener('click', function (e) {
         if ((e.target.classList.contains('service-item') || e.target.closest('.service-item')) && !e.target.closest('button')) {
             const item = e.target.classList.contains('service-item') ? e.target : e.target.closest('.service-item');
@@ -736,3 +753,134 @@ function loadUsersForTagging(selectedUsers = []) {
         });
 }
 
+function loadNotifications() {
+    fetch('get_notifications.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const badge = document.getElementById('notification-badge');
+                const list = document.getElementById('notification-list');
+
+                // Update badge
+                if (data.unread_count > 0) {
+                    badge.textContent = data.unread_count;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                // Update notification list
+                list.innerHTML = '';
+
+                if (data.notifications.length === 0) {
+                    list.innerHTML = '<div class="text-center text-muted p-3">No notifications</div>';
+                    return;
+                }
+
+                data.notifications.forEach(notif => {
+                    const item = document.createElement('a');
+                    item.href = '#';
+                    item.className = 'dropdown-item notification-item py-2 px-3' + (notif.is_read == 0 ? ' unread-notification' : '');
+                    item.dataset.notificationId = notif.id;
+                    item.dataset.testId = notif.test_id;
+                    item.dataset.serviceId = notif.service_id;
+
+                    const timeAgo = formatTimeAgo(notif.created_at);
+
+                    item.innerHTML = `
+                        <div class="d-flex">
+                            ${notif.is_read == 0 ? '<div class="me-2"><span class="badge bg-primary rounded-circle" style="width: 8px; height: 8px;">&nbsp;</span></div>' : '<div class="me-2" style="width: 8px;"></div>'}
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${notif.message}</div>
+                                <small class="text-muted">in ${notif.service_name} • ${timeAgo}</small>
+                            </div>
+                        </div>
+                    `;
+
+                    item.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        handleNotificationClick(notif.id, notif.test_id, notif.service_id);
+                    });
+
+                    list.appendChild(item);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading notifications:', error);
+        });
+}
+
+function handleNotificationClick(notificationId, testId, serviceId) {
+    // Mark notification as read
+    fetch('mark_notification_read.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notification_id: notificationId })
+    }).then(() => {
+        // Reload notifications to update badge
+        loadNotifications();
+
+        // Close dropdown
+        const dropdown = bootstrap.Dropdown.getInstance(document.getElementById('notification-btn'));
+        if (dropdown) {
+            dropdown.hide();
+        }
+
+        // Load the service
+        const serviceItem = document.querySelector(`.service-item[data-id="${serviceId}"]`);
+        if (serviceItem) {
+            document.querySelectorAll('.service-item').forEach(i => i.classList.remove('active'));
+            serviceItem.classList.add('active');
+
+            // Load tests and then highlight the specific test
+            currentFilter = 'all';
+            fetch(`get_tests.php?service_id=${serviceId}&filter=${currentFilter}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('tests-container').innerHTML = html;
+
+                    // Add filter button listeners
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            const activeService = document.querySelector('.service-item.active');
+                            if (activeService) {
+                                loadTests(activeService.dataset.id, this.dataset.filter);
+                            }
+                        });
+                    });
+
+                    // Highlight and scroll to the test
+                    setTimeout(() => {
+                        const testRow = document.querySelector(`tr[data-test-id="${testId}"]`);
+                        if (testRow) {
+                            testRow.classList.add('highlighted-test');
+                            testRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                            // Remove highlight after 3 seconds
+                            setTimeout(() => {
+                                testRow.classList.remove('highlighted-test');
+                            }, 3000);
+                        }
+                    }, 100);
+                });
+        }
+    });
+}
+
+function formatTimeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return 'just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks < 4) return `${weeks}w ago`;
+    return date.toLocaleDateString();
+}

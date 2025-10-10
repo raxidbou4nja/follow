@@ -10,6 +10,14 @@ if ($id) {
         $stmt = $pdo->prepare("SELECT * FROM tests WHERE id = ?");
         $stmt->execute([$id]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Decode tagged_users from JSON
+        if (isset($test['tagged_users']) && $test['tagged_users']) {
+            $test['tagged_users'] = json_decode($test['tagged_users'], true);
+        } else {
+            $test['tagged_users'] = [];
+        }
+
         echo json_encode($test);
     } catch (PDOException $e) {
         echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);

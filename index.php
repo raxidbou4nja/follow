@@ -4,6 +4,10 @@ if (!isset($_COOKIE['user_id'])) {
     header('Location: login.php');
     exit;
 }
+
+// Check if user is admin
+require_once 'includes/auth.php';
+$is_admin = isAdmin();
 ?>
 <html lang="en">
 
@@ -27,9 +31,20 @@ if (!isset($_COOKIE['user_id'])) {
                 </ul>
             </div>
             <div class="col-12 col-md-8 main-content">
+                <?php if (isset($_GET['error']) && $_GET['error'] == 'access_denied'): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> <strong>Access Denied!</strong>
+                        You need Admin role to access that page.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <?php endif; ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h2 class="mb-0">Tests</h2>
                     <div>
+                        <?php if ($is_admin): ?>
+                            <a href="users.php" class="btn btn-success btn-custom me-2"><i class="bi bi-people"></i> Users</a>
+                            <a href="roles.php" class="btn btn-info btn-custom me-2"><i class="bi bi-person-badge"></i> Roles</a>
+                        <?php endif; ?>
                         <button class="btn btn-secondary btn-custom me-2" id="upload-csv-btn"><i class="bi bi-upload"></i> Upload CSV</button>
                         <a href="logout.php" class="btn btn-outline-danger btn-custom"><i class="bi bi-box-arrow-right"></i> Logout</a>
                     </div>
@@ -129,6 +144,12 @@ if (!isset($_COOKIE['user_id'])) {
                         <div class="mb-3">
                             <label for="testDescription" class="form-label">Description</label>
                             <textarea class="form-control" id="testDescription" name="description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tag Users</label>
+                            <div id="taggedUsersContainer" class="border rounded p-2" style="max-height: 150px; overflow-y: auto;">
+                                <p class="text-muted mb-0">Loading users...</p>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Save</button>
                     </form>

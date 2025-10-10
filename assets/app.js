@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('testName').value = '';
             document.getElementById('testDescription').value = '';
             document.getElementById('testModalLabel').textContent = 'Add Test';
+            loadUsersForTagging();
             new bootstrap.Modal(document.getElementById('testModal')).show();
         } else if (e.target.classList.contains('edit-test') || e.target.closest('.edit-test')) {
             const id = e.target.dataset.id || e.target.closest('.edit-test').dataset.id;
@@ -308,6 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('testName').value = data.name;
                     document.getElementById('testDescription').value = data.description;
                     document.getElementById('testModalLabel').textContent = 'Edit Test';
+                    loadUsersForTagging(data.tagged_users || []);
                     new bootstrap.Modal(document.getElementById('testModal')).show();
                 });
         } else if (e.target.classList.contains('delete-test') || e.target.closest('.delete-test')) {
@@ -331,6 +333,14 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData);
+
+        // Collect selected tagged users
+        const taggedUsers = [];
+        document.querySelectorAll('input[name="tagged_users[]"]:checked').forEach(checkbox => {
+            taggedUsers.push(parseInt(checkbox.value));
+        });
+        data.tagged_users = taggedUsers;
+
         fetch('save_test.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -557,8 +567,18 @@ function loadComments(imageId) {
             comments.forEach(comment => {
                 const div = document.createElement('div');
                 div.className = 'comment mb-2 p-2 border rounded bg-light d-flex justify-content-between align-items-start';
+
+                // Display username and email if available
+                const userInfo = comment.username
+                    ? `<span class="badge bg-secondary me-2">@${comment.username}</span>`
+                    : '';
+                const emailInfo = '';
+
                 let html = `<div class="flex-grow-1">
-                    <small class="text-muted fw-bold">${new Date(comment.created_at).toLocaleString()}</small><br>
+                    <div class="mb-1">
+                        ${userInfo}
+                        <small class="text-muted fw-bold ms-2">${new Date(comment.created_at).toLocaleString()}</small>
+                    </div>
                     <span class="comment-text text-dark editable-comment" data-comment-id="${comment.id}" style="cursor: pointer; white-space: pre-line;">${comment.comment_text}</span>`;
                 if (comment.image_url) {
                     html += `<br><img src="${comment.image_url}" class="img-fluid mt-2 rounded" style="max-width: 100%;">`;
@@ -680,3 +700,39 @@ function updateProgressBar() {
         progressBar.style.transition = 'width 0.3s ease-in-out';
     }
 }
+
+function loadUsersForTagging(selectedUsers = []) {
+    fetch('get_users.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.users) {
+                const container = document.getElementById('taggedUsersContainer');
+                container.innerHTML = '';
+
+                if (data.users.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No users available</p>';
+                    return;
+                }
+
+                data.users.forEach(user => {
+                    const isChecked = selectedUsers.includes(user.id);
+                    const checkbox = document.createElement('div');
+                    checkbox.className = 'form-check';
+                    checkbox.innerHTML = `
+                        <input class="form-check-input" type="checkbox" name="tagged_users[]" 
+                               value="${user.id}" id="user_${user.id}" ${isChecked ? 'checked' : ''}>
+                        <label class="form-check-label" for="user_${user.id}">
+                            @${user.username}
+                        </label>
+                    `;
+                    container.appendChild(checkbox);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            document.getElementById('taggedUsersContainer').innerHTML =
+                '<p class="text-danger">Failed to load users</p>';
+        });
+}
+

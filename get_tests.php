@@ -71,9 +71,28 @@ if ($service_id) {
                 $solved_class = $img['is_solved'] ? 'solved-image' : '';
                 $image_links .= "<a href='#' class='image-link {$solved_class}' data-url='{$img['image_url']}' data-image-id='{$img['id']}' data-is-solved='{$img['is_solved']}'>View</a> ";
             }
+
+            // Build description with tagged users
+            $description = htmlspecialchars($test['description'] ?? '');
+            if (!empty($test['tagged_users'])) {
+                $tagged_users = json_decode($test['tagged_users'], true);
+                if (is_array($tagged_users) && count($tagged_users) > 0) {
+                    $user_ids = implode(',', array_map('intval', $tagged_users));
+                    $usersStmt = $pdo->query("SELECT username FROM users WHERE id IN ($user_ids)");
+                    $usernames = $usersStmt->fetchAll(PDO::FETCH_COLUMN);
+
+                    if (count($usernames) > 0) {
+                        $user_tags = array_map(function ($username) {
+                            return "<span class='badge bg-info text-dark'>@{$username}</span>";
+                        }, $usernames);
+                        $description .= '<div class="mt-1">' . implode(' ', $user_tags) . '</div>';
+                    }
+                }
+            }
+
             echo "<tr data-test-id='{$test['id']}'>";
             echo "<td>{$test['name']}</td>";
-            echo "<td>{$test['description']}</td>";
+            echo "<td>{$description}</td>";
             echo "<td><label class='checkbox-container'><input type='checkbox' class='is-passed' " . ($test['is_passed'] ? 'checked' : '') . "><span class='checkmark'></span></label></td>";
             echo "<td><label class='checkbox-container'><input type='checkbox' class='has-error' " . ($test['has_error'] ? 'checked' : '') . "><span class='checkmark'></span></label></td>";
             echo "<td style='width:100px'>$image_links</td>";

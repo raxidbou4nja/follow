@@ -4,8 +4,19 @@ require_once 'includes/connection.php';
 
 $image_id = $_POST['image_id'] ?? '';
 $comment_text = trim($_POST['comment_text'] ?? '');
+$user_id = $_COOKIE['user_id'] ?? null;
 
 if (!empty($image_id) && !empty($comment_text)) {
+    // Validate that user_id exists if provided
+    if ($user_id) {
+        $checkUser = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+        $checkUser->execute([$user_id]);
+        if (!$checkUser->fetch()) {
+            // User doesn't exist, set to null
+            $user_id = null;
+        }
+    }
+
     $image_url = null;
     if (isset($_FILES['comment_image']) && $_FILES['comment_image']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = 'uploads/';
@@ -17,8 +28,8 @@ if (!empty($image_id) && !empty($comment_text)) {
     }
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO comments (image_id, comment_text, image_url) VALUES (?, ?, ?)");
-        $stmt->execute([$image_id, $comment_text, $image_url]);
+        $stmt = $pdo->prepare("INSERT INTO comments (image_id, user_id, comment_text, image_url) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$image_id, $user_id, $comment_text, $image_url]);
         echo json_encode(['success' => true, 'image_url' => $image_url ?: null]);
     } catch (PDOException $e) {
         echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);

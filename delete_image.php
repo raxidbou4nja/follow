@@ -11,14 +11,15 @@ if (isset($data['id'])) {
         $image = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($image) {
-            // Delete the file if it exists
-            $filePath = 'uploads/' . basename($image['image_url']);
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
+            // Note: We keep the physical file but mark the record as deleted
+            // If you want to delete the file, uncomment the code below:
+            // $filePath = 'uploads/' . basename($image['image_url']);
+            // if (file_exists($filePath)) {
+            //     unlink($filePath);
+            // }
 
-            // Delete the record
-            $stmt = $pdo->prepare("DELETE FROM test_images WHERE id = ?");
+            // Soft delete the record
+            $stmt = $pdo->prepare("UPDATE test_images SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL");
             $stmt->execute([$data['id']]);
             echo json_encode(['success' => true]);
         } else {

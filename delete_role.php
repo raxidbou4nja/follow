@@ -10,7 +10,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if (isset($data['id'])) {
     try {
-        $stmt = $pdo->prepare("DELETE FROM roles WHERE id = ?");
+        // Soft delete: set deleted_at instead of hard delete
+        $stmt = $pdo->prepare("UPDATE roles SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$data['id']]);
         echo json_encode(['success' => true, 'message' => 'Role deleted successfully']);
     } catch (PDOException $e) {

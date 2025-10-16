@@ -10,13 +10,13 @@ if (isset($data['name'], $data['service_id'])) {
 
     try {
         if (isset($data['id']) && $data['id']) {
-            // Update - Get previous tagged users to find new tags
-            $prevStmt = $pdo->prepare("SELECT tagged_users FROM tests WHERE id = ?");
+            // Update - Get previous tagged users to find new tags (only non-deleted tests)
+            $prevStmt = $pdo->prepare("SELECT tagged_users FROM tests WHERE id = ? AND deleted_at IS NULL");
             $prevStmt->execute([$data['id']]);
             $prevTagged = $prevStmt->fetch(PDO::FETCH_ASSOC)['tagged_users'] ?? null;
             $prevTaggedArray = $prevTagged ? json_decode($prevTagged, true) : [];
 
-            $stmt = $pdo->prepare("UPDATE tests SET name = ?, description = ?, tagged_users = ? WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE tests SET name = ?, description = ?, tagged_users = ? WHERE id = ? AND deleted_at IS NULL");
             $stmt->execute([$data['name'], $data['description'], $tagged_users, $data['id']]);
 
             $test_id = $data['id'];
@@ -36,8 +36,8 @@ if (isset($data['name'], $data['service_id'])) {
 
         // Create notifications for newly tagged users
         if (!empty($newlyTagged)) {
-            // Get the user who created/updated the test
-            $creatorStmt = $pdo->prepare("SELECT username FROM users WHERE id = ?");
+            // Get the user who created/updated the test (only non-deleted users)
+            $creatorStmt = $pdo->prepare("SELECT username FROM users WHERE id = ? AND deleted_at IS NULL");
             $creatorStmt->execute([$current_user_id]);
             $creator = $creatorStmt->fetch(PDO::FETCH_ASSOC);
             $creator_name = $creator['username'] ?? 'Someone';

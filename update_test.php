@@ -9,7 +9,7 @@ if (isset($data['test_id'], $data['field'], $data['value'])) {
     $value = $data['value'];
 
     if (in_array($field, ['is_passed', 'has_error'])) {
-        $stmt = $pdo->prepare("UPDATE tests SET $field = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE tests SET $field = ? WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$value, $test_id]);
         echo json_encode(['success' => true]);
     } else {

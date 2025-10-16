@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 require_once 'includes/connection.php';
 
 try {
-    $stmt = $pdo->query("SELECT * FROM roles ORDER BY name");
+    $stmt = $pdo->query("SELECT * FROM roles WHERE deleted_at IS NULL ORDER BY name");
     $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
     echo json_encode(['success' => true, 'roles' => $roles]);
 } catch (PDOException $e) {

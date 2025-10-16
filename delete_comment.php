@@ -7,7 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($comment_id) {
         try {
-            $stmt = $pdo->prepare("DELETE FROM comments WHERE id = ?");
+            // Soft delete: set deleted_at instead of hard delete
+            $stmt = $pdo->prepare("UPDATE comments SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL");
             $stmt->execute([$comment_id]);
 
             if ($stmt->rowCount() > 0) {

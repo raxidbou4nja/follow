@@ -9,8 +9,8 @@ if ($image_id) {
             SELECT c.id, c.comment_text, c.image_url, c.created_at, 
                    u.username, u.email
             FROM comments c
-            LEFT JOIN users u ON c.user_id = u.id
-            WHERE c.image_id = ? 
+            LEFT JOIN users u ON c.user_id = u.id AND u.deleted_at IS NULL
+            WHERE c.image_id = ? AND c.deleted_at IS NULL
             ORDER BY c.created_at DESC
         ");
         $stmt->execute([$image_id]);

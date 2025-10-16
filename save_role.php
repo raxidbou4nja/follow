@@ -11,8 +11,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 if (isset($data['name'])) {
     try {
         if (isset($data['id']) && $data['id']) {
-            // Update
-            $stmt = $pdo->prepare("UPDATE roles SET name = ?, description = ? WHERE id = ?");
+            // Update (only non-deleted roles)
+            $stmt = $pdo->prepare("UPDATE roles SET name = ?, description = ? WHERE id = ? AND deleted_at IS NULL");
             $stmt->execute([$data['name'], $data['description'] ?? '', $data['id']]);
             echo json_encode(['success' => true, 'message' => 'Role updated successfully']);
         } else {

@@ -5,8 +5,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // Find user by email only
-    $stmt = $pdo->prepare("SELECT id, username, email, password_hash FROM users WHERE email = ?");
+    // Find user by email only (exclude deleted users)
+    $stmt = $pdo->prepare("SELECT id, username, email, password_hash FROM users WHERE email = ? AND deleted_at IS NULL");
     $stmt->execute([$email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 

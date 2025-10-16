@@ -7,7 +7,7 @@ require_once 'includes/connection.php';
 $id = $_GET['id'] ?? 0;
 if ($id) {
     try {
-        $stmt = $pdo->prepare("SELECT * FROM tests WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT * FROM tests WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$id]);
         $test = $stmt->fetch(PDO::FETCH_ASSOC);
 

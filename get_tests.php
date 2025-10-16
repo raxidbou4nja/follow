@@ -10,12 +10,12 @@ if ($service_id) {
     try {
         echo '<button class="btn btn-primary btn-sm mb-2" id="add-test-btn" data-service-id="' . $service_id . '"><i class="bi bi-plus-circle"></i> Add Test</button>';
 
-        // Get statistics first
-        $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ?");
+        // Get statistics first (exclude deleted tests)
+        $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ? AND deleted_at IS NULL");
         $totalStmt->execute([$service_id]);
         $total = $totalStmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        $solvedStmt = $pdo->prepare("SELECT COUNT(*) as solved FROM tests WHERE service_id = ? AND is_passed = 1");
+        $solvedStmt = $pdo->prepare("SELECT COUNT(*) as solved FROM tests WHERE service_id = ? AND is_passed = 1 AND deleted_at IS NULL");
         $solvedStmt->execute([$service_id]);
         $solved = $solvedStmt->fetch(PDO::FETCH_ASSOC)['solved'];
 
@@ -51,7 +51,7 @@ if ($service_id) {
         echo '</div>';
         echo '</div>';
 
-        $where = "WHERE service_id = ?";
+        $where = "WHERE service_id = ? AND deleted_at IS NULL";
         if ($filter == 'passed') $where .= " AND is_passed = 1";
         elseif ($filter == 'error') $where .= " AND has_error = 1";
         elseif ($filter == 'undone') $where .= " AND is_passed = 0 AND has_error = 0";
@@ -66,7 +66,7 @@ if ($service_id) {
         echo '<tbody>';
 
         foreach ($tests as $test) {
-            $images = $pdo->prepare("SELECT id, image_url, is_solved FROM test_images WHERE test_id = ?");
+            $images = $pdo->prepare("SELECT id, image_url, is_solved FROM test_images WHERE test_id = ? AND deleted_at IS NULL");
             $images->execute([$test['id']]);
             $image_data = $images->fetchAll(PDO::FETCH_ASSOC);
 
@@ -82,7 +82,7 @@ if ($service_id) {
                 $tagged_users = json_decode($test['tagged_users'], true);
                 if (is_array($tagged_users) && count($tagged_users) > 0) {
                     $user_ids = implode(',', array_map('intval', $tagged_users));
-                    $usersStmt = $pdo->query("SELECT username FROM users WHERE id IN ($user_ids)");
+                    $usersStmt = $pdo->query("SELECT username FROM users WHERE id IN ($user_ids) AND deleted_at IS NULL");
                     $usernames = $usersStmt->fetchAll(PDO::FETCH_COLUMN);
 
                     if (count($usernames) > 0) {

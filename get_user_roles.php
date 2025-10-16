@@ -9,7 +9,8 @@ if ($user_id) {
         $stmt = $pdo->prepare("
             SELECT r.*, ur.id as user_role_id 
             FROM roles r
-            LEFT JOIN user_roles ur ON r.id = ur.role_id AND ur.user_id = ?
+            LEFT JOIN user_roles ur ON r.id = ur.role_id AND ur.user_id = ? AND ur.deleted_at IS NULL
+            WHERE r.deleted_at IS NULL
             ORDER BY r.name
         ");
         $stmt->execute([$user_id]);

@@ -8,7 +8,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($comment_id && $comment_text) {
         try {
-            $stmt = $pdo->prepare("UPDATE comments SET comment_text = ? WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE comments SET comment_text = ? WHERE id = ? AND deleted_at IS NULL");
             $stmt->execute([$comment_text, $comment_id]);
 
             if ($stmt->rowCount() > 0) {

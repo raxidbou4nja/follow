@@ -7,12 +7,12 @@ $comment_text = trim($_POST['comment_text'] ?? '');
 $user_id = $_COOKIE['user_id'] ?? null;
 
 if (!empty($image_id) && !empty($comment_text)) {
-    // Validate that user_id exists if provided
+    // Validate that user_id exists if provided (only non-deleted users)
     if ($user_id) {
-        $checkUser = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+        $checkUser = $pdo->prepare("SELECT id FROM users WHERE id = ? AND deleted_at IS NULL");
         $checkUser->execute([$user_id]);
         if (!$checkUser->fetch()) {
-            // User doesn't exist, set to null
+            // User doesn't exist or is deleted, set to null
             $user_id = null;
         }
     }

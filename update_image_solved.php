@@ -13,7 +13,7 @@ if (isset($data['image_id']) && isset($data['is_solved'])) {
         // Debug logging
         error_log("Updating image ID: $imageId, is_solved: " . ($isSolved ? 'true' : 'false'));
 
-        $stmt = $pdo->prepare("UPDATE test_images SET is_solved = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE test_images SET is_solved = ? WHERE id = ? AND deleted_at IS NULL");
         $result = $stmt->execute([$isSolved ? 1 : 0, $imageId]);
 
         $rowsAffected = $stmt->rowCount();
@@ -25,7 +25,7 @@ if (isset($data['image_id']) && isset($data['is_solved'])) {
             echo json_encode(['success' => true, 'rows_affected' => $rowsAffected]);
         } else {
             // Check if image exists
-            $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM test_images WHERE id = ?");
+            $checkStmt = $pdo->prepare("SELECT COUNT(*) FROM test_images WHERE id = ? AND deleted_at IS NULL");
             $checkStmt->execute([$imageId]);
             $exists = $checkStmt->fetchColumn() > 0;
 

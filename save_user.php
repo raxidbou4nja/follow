@@ -34,8 +34,8 @@ if (isset($data['username'], $data['email'], $data['password'])) {
 
     try {
         if ($userId) {
-            // Update existing user
-            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND id != ?");
+            // Update existing user (only non-deleted)
+            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND id != ? AND deleted_at IS NULL");
             $checkStmt->execute([$username, $email, $userId]);
             if ($checkStmt->fetch()) {
                 echo json_encode(['success' => false, 'error' => 'Username or email already exists']);
@@ -44,16 +44,16 @@ if (isset($data['username'], $data['email'], $data['password'])) {
 
             if (!empty($password)) {
                 $password_hash = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, password_hash = ? WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, password_hash = ? WHERE id = ? AND deleted_at IS NULL");
                 $stmt->execute([$username, $email, $password_hash, $userId]);
             } else {
-                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ? AND deleted_at IS NULL");
                 $stmt->execute([$username, $email, $userId]);
             }
             echo json_encode(['success' => true, 'message' => 'User updated successfully']);
         } else {
-            // Create new user
-            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
+            // Create new user (check for duplicates excluding deleted)
+            $checkStmt = $pdo->prepare("SELECT id FROM users WHERE (username = ? OR email = ?) AND deleted_at IS NULL");
             $checkStmt->execute([$username, $email]);
             if ($checkStmt->fetch()) {
                 echo json_encode(['success' => false, 'error' => 'Username or email already exists']);

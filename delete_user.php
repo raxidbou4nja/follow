@@ -29,12 +29,12 @@ if (isset($data['id'])) {
         }
 
         if ($roleCount > 0) {
-            // Delete user roles
-            $pdo->prepare("DELETE FROM user_roles WHERE user_id = ?")->execute([$userId]);
+            // Soft delete user roles
+            $pdo->prepare("UPDATE user_roles SET deleted_at = NOW() WHERE user_id = ? AND deleted_at IS NULL")->execute([$userId]);
         }
 
-        // Now delete the user
-        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+        // Now soft delete the user
+        $stmt = $pdo->prepare("UPDATE users SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$userId]);
 
         if ($stmt->rowCount() > 0) {

@@ -5,8 +5,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 if (isset($data['name'])) {
     if (isset($data['id']) && $data['id']) {
-        // Update
-        $stmt = $pdo->prepare("UPDATE services SET name = ?, description = ? WHERE id = ?");
+        // Update (only non-deleted services)
+        $stmt = $pdo->prepare("UPDATE services SET name = ?, description = ? WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$data['name'], $data['description'], $data['id']]);
     } else {
         // Insert

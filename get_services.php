@@ -4,14 +4,14 @@ ini_set('display_errors', 0);
 require_once 'includes/connection.php';
 
 try {
-    $stmt = $pdo->query("SELECT * FROM services ORDER BY name");
+    $stmt = $pdo->query("SELECT * FROM services WHERE deleted_at IS NULL ORDER BY name");
     while ($service = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        // Get statistics for this service
-        $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ?");
+        // Get statistics for this service (exclude deleted tests)
+        $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ? AND deleted_at IS NULL");
         $totalStmt->execute([$service['id']]);
         $total = $totalStmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        $solvedStmt = $pdo->prepare("SELECT COUNT(*) as solved FROM tests WHERE service_id = ? AND is_passed = 1");
+        $solvedStmt = $pdo->prepare("SELECT COUNT(*) as solved FROM tests WHERE service_id = ? AND is_passed = 1 AND deleted_at IS NULL");
         $solvedStmt->execute([$service['id']]);
         $solved = $solvedStmt->fetch(PDO::FETCH_ASSOC)['solved'];
 

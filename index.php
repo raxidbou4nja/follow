@@ -33,9 +33,9 @@ $is_admin = isAdmin();
                     <div class="logo-subtitle mt-2">Testing Manager</div>
                 </div>
 
-                <h4 class="mb-3" style="font-weight: 700; color: var(--primary-color);">Services</h4>
+                <h4 class="mb-3" style="font-weight: 700; color: var(--primary-color);">Tasks</h4>
                 <button class="btn btn-primary btn-custom mb-3 w-100" id="add-service-btn">
-                    <i class="bi bi-plus-circle"></i> Add Service
+                    <i class="bi bi-plus-circle"></i> Add Task
                 </button>
 
                 <!-- Search Bar for Services -->
@@ -58,7 +58,7 @@ $is_admin = isAdmin();
                 <?php endif; ?>
                 <div class="header-container mb-4">
                     <div class="page-header">
-                        <h2 class="mb-0">Tests Management</h2>
+                        <h2 class="mb-0">Tasks Management</h2>
                     </div>
                     <div class="header-buttons">
                         <button class="btn btn-icon-header position-relative" id="notification-btn" data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications">
@@ -101,8 +101,8 @@ $is_admin = isAdmin();
                         <div class="empty-state-icon">
                             <i class="bi bi-clipboard2-data"></i>
                         </div>
-                        <div class="empty-state-title">No Service Selected</div>
-                        <div class="empty-state-text">Please select a service from the sidebar to view and manage tests</div>
+                        <div class="empty-state-title">No Task Selected</div>
+                        <div class="empty-state-text">Please select a Task from the sidebar to view and manage tests</div>
                     </div>
                 </div>
             </div>
@@ -157,7 +157,7 @@ $is_admin = isAdmin();
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="serviceModalLabel">Add Service</h5>
+                    <h5 class="modal-title" id="serviceModalLabel">Add Task</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -228,7 +228,7 @@ $is_admin = isAdmin();
                         <div class="mb-3">
                             <label for="csvType" class="form-label">Import Type</label>
                             <select class="form-control" id="csvType" name="type" required>
-                                <option value="services">Services (columns: name, description)</option>
+                                <option value="services">Tasks (columns: name, description)</option>
                                 <option value="tests">Tests (columns: service_name, name, description)</option>
                             </select>
                         </div>

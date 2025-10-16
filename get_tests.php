@@ -114,5 +114,5 @@ if ($service_id) {
         echo '<p class="text-danger">Database error: Unable to load tests.</p>';
     }
 } else {
-    echo '<p>No service selected.</p>';
+    echo '<p>No Task selected.</p>';
 }

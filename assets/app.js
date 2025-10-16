@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('serviceId').value = '';
         document.getElementById('serviceName').value = '';
         document.getElementById('serviceDescription').value = '';
-        document.getElementById('serviceModalLabel').textContent = 'Add Service';
+        document.getElementById('serviceModalLabel').textContent = 'Add Task';
         new bootstrap.Modal(document.getElementById('serviceModal')).show();
     });
 

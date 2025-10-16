@@ -15,12 +15,12 @@ function isAdmin()
 
     global $pdo;
 
-    // Check if user has Admin role
+    // Check if user has Admin role (exclude soft-deleted records)
     $stmt = $pdo->prepare("
         SELECT r.name 
         FROM user_roles ur
-        JOIN roles r ON ur.role_id = r.id
-        WHERE ur.user_id = ? AND r.name = 'Admin'
+        JOIN roles r ON ur.role_id = r.id AND r.deleted_at IS NULL
+        WHERE ur.user_id = ? AND r.name = 'Admin' AND ur.deleted_at IS NULL
     ");
     $stmt->execute([$user_id]);
 

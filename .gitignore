@@ -1,0 +1,25 @@
+# Uploads directory
+uploads/*
+!uploads/.gitkeep
+
+# Configuration (if you have sensitive data)
+# includes/config.php
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

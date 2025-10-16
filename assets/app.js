@@ -10,6 +10,43 @@ document.addEventListener('DOMContentLoaded', function () {
     // Refresh notifications every 30 seconds
     setInterval(loadNotifications, 30000);
 
+    // Service Search Functionality
+    document.getElementById('service-search').addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const serviceItems = document.querySelectorAll('.service-item');
+
+        serviceItems.forEach(item => {
+            const serviceName = item.querySelector('.service-name');
+            if (serviceName) {
+                const nameText = serviceName.textContent.toLowerCase();
+                if (nameText.includes(searchTerm)) {
+                    item.style.setProperty('display', 'flex', 'important');
+                } else {
+                    item.style.setProperty('display', 'none', 'important');
+                }
+            }
+        });
+    });
+
+    // Test Search Functionality (Inline)
+    document.addEventListener('input', function (e) {
+        if (e.target.id === 'test-search-inline') {
+            const searchTerm = e.target.value.toLowerCase();
+            const testRows = document.querySelectorAll('#tests-container tbody tr');
+
+            testRows.forEach(row => {
+                const testName = row.cells[0].textContent.toLowerCase();
+                const testDescription = row.cells[1].textContent.toLowerCase();
+
+                if (testName.includes(searchTerm) || testDescription.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+    });
+
     // Service selection
     // Notification handlers
     document.getElementById('mark-all-read').addEventListener('click', function () {
@@ -42,12 +79,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = e.target.dataset.url;
             const imageId = e.target.dataset.imageId;
             const isSolved = e.target.dataset.isSolved == '1';
+            const testName = e.target.dataset.testName || 'Image';
 
-            console.log('Image clicked:', { url, imageId, isSolved, element: e.target });
+            console.log('Image clicked:', { url, imageId, isSolved, testName, element: e.target });
             console.log('All dataset:', e.target.dataset);
 
             document.getElementById('modal-image').src = url;
             document.getElementById('commentImageId').value = imageId;
+            document.querySelector('#imageModal .modal-title').textContent = testName;
             updateSolvedButton(isSolved);
             loadComments(imageId);
             new bootstrap.Modal(document.getElementById('imageModal')).show();

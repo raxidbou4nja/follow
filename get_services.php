@@ -26,7 +26,7 @@ try {
         $fontSize = $percentage == 100 ? '6px' : ($percentage >= 10 ? '7px' : '8px');
 
         echo "<li class='list-group-item service-item d-flex justify-content-between align-items-center' data-id='{$service['id']}'>
-                <span>{$service['name']}</span>
+                <span class='service-name'>{$service['name']}</span>
                 <div class='d-flex align-items-center'>
                     <div class='position-relative me-2' style='width: 30px; height: 30px;'>
                         <svg class='position-absolute' width='30' height='30' viewBox='0 0 42 42' style='transform: rotate(-90deg);'>

@@ -15,6 +15,9 @@ $is_admin = isAdmin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Testing Platform Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/style.css">
@@ -24,8 +27,23 @@ $is_admin = isAdmin();
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 col-md-3 sidebar">
-                <h4 class="mt-3">Services</h4>
-                <button class="btn btn-primary btn-custom mb-2" id="add-service-btn">Add Service</button>
+                <!-- Logo -->
+                <div class="logo-container">
+                    <img src="uploads/logo.png" alt="" width="80%">
+                    <div class="logo-subtitle mt-2">Testing Manager</div>
+                </div>
+
+                <h4 class="mb-3" style="font-weight: 700; color: var(--primary-color);">Services</h4>
+                <button class="btn btn-primary btn-custom mb-3 w-100" id="add-service-btn">
+                    <i class="bi bi-plus-circle"></i> Add Service
+                </button>
+
+                <!-- Search Bar for Services -->
+                <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" class="search-bar" id="service-search" placeholder="Search services...">
+                </div>
+
                 <ul class="list-group" id="services-list">
                     <!-- Services loaded via AJAX -->
                 </ul>
@@ -38,39 +56,46 @@ $is_admin = isAdmin();
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 <?php endif; ?>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="mb-0">Tests</h2>
-                    <div>
-                        <div class="btn me-2">
-                            <button class="btn btn-outline-secondary btn-custom position-relative" id="notification-btn" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-bell"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none;">
-                                    0
-                                </span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notification-dropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
-                                <li class="dropdown-header d-flex justify-content-between align-items-center">
-                                    <span>Notifications</span>
-                                    <button class="btn btn-sm btn-link text-decoration-none" id="mark-all-read">Mark all read</button>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li id="notification-list">
-                                    <div class="text-center text-muted p-3">Loading...</div>
-                                </li>
-                            </ul>
-                        </div>
+                <div class="header-container mb-4">
+                    <div class="page-header">
+                        <h2 class="mb-0">Tests Management</h2>
+                    </div>
+                    <div class="header-buttons">
+                        <button class="btn btn-header btn-custom position-relative" id="notification-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none;">
+                                0
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notification-dropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                            <li class="dropdown-header d-flex justify-content-between align-items-center">
+                                <span>Notifications</span>
+                                <button class="btn btn-sm btn-link text-decoration-none" id="mark-all-read">Mark all read</button>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li id="notification-list">
+                                <div class="text-center text-muted p-3">Loading...</div>
+                            </li>
+                        </ul>
                         <?php if ($is_admin): ?>
-                            <a href="users.php" class="btn btn-success btn-custom me-2"><i class="bi bi-people"></i> Users</a>
-                            <a href="roles.php" class="btn btn-info btn-custom me-2"><i class="bi bi-person-badge"></i> Roles</a>
+                            <a href="users.php" class="btn btn-header btn-custom"><i class="bi bi-people"></i> Users</a>
+                            <a href="roles.php" class="btn btn-header btn-custom"><i class="bi bi-person-badge"></i> Roles</a>
                         <?php endif; ?>
-                        <button class="btn btn-secondary btn-custom me-2" id="upload-csv-btn"><i class="bi bi-upload"></i> Upload CSV</button>
-                        <a href="logout.php" class="btn btn-outline-danger btn-custom"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        <button class="btn btn-header btn-custom" id="upload-csv-btn"><i class="bi bi-upload"></i> Upload CSV</button>
+                        <a href="logout.php" class="btn btn-header btn-custom btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
                     </div>
                 </div>
+
                 <div id="tests-container" class="fade-in">
-                    <p>Select a service to view tests.</p>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="bi bi-clipboard2-data"></i>
+                        </div>
+                        <div class="empty-state-title">No Service Selected</div>
+                        <div class="empty-state-text">Please select a service from the sidebar to view and manage tests</div>
+                    </div>
                 </div>
             </div>
         </div>

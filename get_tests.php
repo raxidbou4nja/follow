@@ -8,7 +8,7 @@ $filter = $_GET['filter'] ?? 'all';
 
 if ($service_id) {
     try {
-        echo '<button class="btn btn-primary btn-sm mb-2" id="add-test-btn" data-service-id="' . $service_id . '">Add Test</button>';
+        echo '<button class="btn btn-primary btn-sm mb-2" id="add-test-btn" data-service-id="' . $service_id . '"><i class="bi bi-plus-circle"></i> Add Test</button>';
 
         // Get statistics first
         $totalStmt = $pdo->prepare("SELECT COUNT(*) as total FROM tests WHERE service_id = ?");
@@ -23,17 +23,21 @@ if ($service_id) {
         $passed_active = $filter == 'passed' ? ' active' : '';
         $error_active = $filter == 'error' ? ' active' : '';
         $undone_active = $filter == 'undone' ? ' active' : '';
-        echo '<div class="d-flex justify-content-between align-items-center mb-2">';
-        echo '<div>';
-        echo '<button class="btn btn-secondary btn-sm me-2 filter-btn' . $all_active . '" data-filter="all">All</button>';
-        echo '<button class="btn btn-success btn-sm me-2 filter-btn' . $passed_active . '" data-filter="passed">Passed</button>';
-        echo '<button class="btn btn-danger btn-sm me-2 filter-btn' . $error_active . '" data-filter="error">With Errors</button>';
-        echo '<button class="btn btn-warning btn-sm me-2 filter-btn' . $undone_active . '" data-filter="undone">Undone</button>';
+        echo '<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">';
+        echo '<div class="d-flex align-items-center gap-2 flex-wrap">';
+        echo '<button class="btn btn-secondary btn-sm filter-btn' . $all_active . '" data-filter="all">All</button>';
+        echo '<button class="btn btn-success btn-sm filter-btn' . $passed_active . '" data-filter="passed">Passed</button>';
+        echo '<button class="btn btn-danger btn-sm filter-btn' . $error_active . '" data-filter="error">With Errors</button>';
+        echo '<button class="btn btn-warning btn-sm filter-btn' . $undone_active . '" data-filter="undone">Undone</button>';
+        echo '<div class="search-container-inline" style="margin: 0;">';
+        echo '<i class="bi bi-search search-icon-inline"></i>';
+        echo '<input type="text" class="search-bar-inline" id="test-search-inline" placeholder="Search tests...">';
         echo '</div>';
-        echo '<div class="d-flex align-items-center">';
+        echo '</div>';
+        echo '<div class="d-flex align-items-center gap-2">';
         $percentage = $total > 0 ? round(($solved / $total) * 100) : 0;
         $progressClass = $percentage >= 80 ? 'bg-success' : ($percentage >= 50 ? 'bg-warning' : 'bg-danger');
-        echo '<div class="me-3">';
+        echo '<div>';
         echo '<small class="text-muted me-2">Progress:</small>';
         echo '<div class="progress" style="width: 120px; height: 20px;">';
         echo '<div class="progress-bar ' . $progressClass . '" role="progressbar" style="width: ' . $percentage . '%">';
@@ -58,7 +62,7 @@ if ($service_id) {
 
         echo '<div class="table-responsive">';
         echo '<table class="table table-striped">';
-        echo '<thead><tr><th>Name</th><th style="width: 30%;">Description</th><th>Passed</th><th>Error</th><th>Images</th><th>Upload</th><th>Actions</th></tr></thead>';
+        echo '<thead><tr><th>Name</th><th>Description</th><th>Passed</th><th>Error</th><th>Images</th><th>Upload</th><th>Actions</th></tr></thead>';
         echo '<tbody>';
 
         foreach ($tests as $test) {
@@ -69,7 +73,7 @@ if ($service_id) {
             $image_links = '';
             foreach ($image_data as $img) {
                 $solved_class = $img['is_solved'] ? 'solved-image' : '';
-                $image_links .= "<a href='#' class='image-link {$solved_class}' data-url='{$img['image_url']}' data-image-id='{$img['id']}' data-is-solved='{$img['is_solved']}'>View</a> ";
+                $image_links .= "<a href='#' class='image-link {$solved_class}' data-url='{$img['image_url']}' data-image-id='{$img['id']}' data-is-solved='{$img['is_solved']}' data-test-name='" . htmlspecialchars($test['name']) . "'>View</a> ";
             }
 
             // Build description with tagged users
@@ -95,7 +99,7 @@ if ($service_id) {
             echo "<td>{$description}</td>";
             echo "<td><label class='checkbox-container'><input type='checkbox' class='is-passed' " . ($test['is_passed'] ? 'checked' : '') . "><span class='checkmark'></span></label></td>";
             echo "<td><label class='checkbox-container'><input type='checkbox' class='has-error' " . ($test['has_error'] ? 'checked' : '') . "><span class='checkmark'></span></label></td>";
-            echo "<td style='width:100px'>$image_links</td>";
+            echo "<td style='width:120px'>$image_links</td>";
             echo "<td><button class='btn btn-sm btn-primary upload-btn' data-test-id='{$test['id']}'><i class='bi bi-upload'></i> Upload</button></td>";
             echo "<td>
                     <button class='btn btn-xs btn-outline-secondary edit-test' data-id='{$test['id']}'><i class='bi bi-pencil'></i></button>

@@ -1,6 +1,12 @@
 let currentFilter = 'all';
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Initialize Bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
     // Load initial services
     loadServices();
 
@@ -9,6 +15,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Refresh notifications every 30 seconds
     setInterval(loadNotifications, 30000);
+
+    // Handle dropdown show/hide events for z-index
+    document.addEventListener('show.bs.dropdown', function (e) {
+        const serviceItem = e.target.closest('.service-item');
+        if (serviceItem) {
+            serviceItem.style.zIndex = '1060';
+        }
+    });
+
+    document.addEventListener('hide.bs.dropdown', function (e) {
+        const serviceItem = e.target.closest('.service-item');
+        if (serviceItem) {
+            // Reset z-index after animation
+            setTimeout(() => {
+                if (serviceItem.classList.contains('active')) {
+                    serviceItem.style.zIndex = '2';
+                } else {
+                    serviceItem.style.zIndex = '1';
+                }
+            }, 150);
+        }
+    });
 
     // Service Search Functionality
     document.getElementById('service-search').addEventListener('input', function (e) {
@@ -60,6 +88,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.addEventListener('click', function (e) {
+        // Prevent service selection when clicking dropdown or its menu items
+        if (e.target.closest('.dropdown') || e.target.closest('.dropdown-menu')) {
+            return;
+        }
+
         if ((e.target.classList.contains('service-item') || e.target.closest('.service-item')) && !e.target.closest('button')) {
             const item = e.target.classList.contains('service-item') ? e.target : e.target.closest('.service-item');
             // Remove active class from all
@@ -289,6 +322,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('edit-service') || e.target.closest('.edit-service')) {
+            e.preventDefault();
             const id = e.target.dataset.id || e.target.closest('.edit-service').dataset.id;
             fetch(`get_service.php?id=${id}`)
                 .then(response => response.json())
@@ -304,6 +338,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     new bootstrap.Modal(document.getElementById('serviceModal')).show();
                 });
         } else if (e.target.classList.contains('delete-service') || e.target.closest('.delete-service')) {
+            e.preventDefault();
             if (confirm('Delete this service?')) {
                 const id = e.target.dataset.id || e.target.closest('.delete-service').dataset.id;
                 fetch('delete_service.php', {

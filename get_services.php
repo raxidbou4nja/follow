@@ -39,9 +39,15 @@ try {
                             <small class='fw-bold {$progressClass}' style='font-size: {$fontSize};'>{$percentage}%</small>
                         </div>
                     </div>
-                    <div>
-                        <button class='btn btn-xs btn-outline-secondary edit-service' data-id='{$service['id']}'><i class='bi bi-pencil'></i></button>
-                        <button class='btn btn-xs btn-outline-danger delete-service' data-id='{$service['id']}'><i class='bi bi-trash'></i></button>
+                    <div class='dropdown'>
+                        <button class='btn btn-link service-menu-btn p-0' type='button' data-bs-toggle='dropdown' aria-expanded='false'>
+                            <i class='bi bi-three-dots-vertical'></i>
+                        </button>
+                        <ul class='dropdown-menu dropdown-menu-end service-dropdown-menu'>
+                            <li><a class='dropdown-item edit-service' href='#' data-id='{$service['id']}'><i class='bi bi-pencil me-2'></i>Edit</a></li>
+                            <li><hr class='dropdown-divider'></li>
+                            <li><a class='dropdown-item text-danger delete-service' href='#' data-id='{$service['id']}'><i class='bi bi-trash me-2'></i>Delete</a></li>
+                        </ul>
                     </div>
                 </div>
               </li>";

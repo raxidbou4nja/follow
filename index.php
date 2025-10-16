@@ -61,7 +61,7 @@ $is_admin = isAdmin();
                         <h2 class="mb-0">Tests Management</h2>
                     </div>
                     <div class="header-buttons">
-                        <button class="btn btn-header btn-custom position-relative" id="notification-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-icon-header position-relative" id="notification-btn" data-bs-toggle="dropdown" aria-expanded="false" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Notifications">
                             <i class="bi bi-bell"></i>
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none;">
                                 0
@@ -80,11 +80,19 @@ $is_admin = isAdmin();
                             </li>
                         </ul>
                         <?php if ($is_admin): ?>
-                            <a href="users.php" class="btn btn-header btn-custom"><i class="bi bi-people"></i> Users</a>
-                            <a href="roles.php" class="btn btn-header btn-custom"><i class="bi bi-person-badge"></i> Roles</a>
+                            <a href="users.php" class="btn btn-icon-header" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Users">
+                                <i class="bi bi-people"></i>
+                            </a>
+                            <a href="roles.php" class="btn btn-icon-header" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Roles">
+                                <i class="bi bi-person-badge"></i>
+                            </a>
                         <?php endif; ?>
-                        <button class="btn btn-header btn-custom" id="upload-csv-btn"><i class="bi bi-upload"></i> Upload CSV</button>
-                        <a href="logout.php" class="btn btn-header btn-custom btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        <button class="btn btn-icon-header" id="upload-csv-btn" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Upload CSV">
+                            <i class="bi bi-upload"></i>
+                        </button>
+                        <a href="logout.php" class="btn btn-icon-header btn-logout" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
                     </div>
                 </div>
 

@@ -29,7 +29,7 @@ $is_admin = isAdmin();
             <div class="col-12 col-md-3 sidebar">
                 <!-- Logo -->
                 <div class="logo-container">
-                    <img src="uploads/logo.png" alt="" width="80%">
+                    <img src="assets/images/logo.png" alt="" width="80%">
                     <div class="logo-subtitle mt-2">Testing Manager</div>
                 </div>
 

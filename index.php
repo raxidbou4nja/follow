@@ -41,7 +41,7 @@ $is_admin = isAdmin();
                 <!-- Search Bar for Services -->
                 <div class="search-container">
                     <i class="bi bi-search search-icon"></i>
-                    <input type="text" class="search-bar" id="service-search" placeholder="Search services...">
+                    <input type="text" class="search-bar" id="service-search" placeholder="Search Tasks...">
                 </div>
 
                 <ul class="list-group" id="services-list">
